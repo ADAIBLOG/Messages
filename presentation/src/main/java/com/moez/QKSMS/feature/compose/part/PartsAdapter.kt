@@ -21,6 +21,7 @@ package org.prauga.messages.feature.compose.part
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import org.prauga.messages.R
 import org.prauga.messages.common.base.QkViewHolder
 import org.prauga.messages.common.util.Colors
 import org.prauga.messages.common.widget.QkContextMenuRecyclerView
@@ -31,7 +32,6 @@ import org.prauga.messages.feature.compose.MessagesAdapter
 import org.prauga.messages.model.Message
 import org.prauga.messages.model.MmsPart
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.message_list_item_in.*
 import javax.inject.Inject
 
 
@@ -69,7 +69,7 @@ class PartsAdapter @Inject constructor(
         this.message = message
         this.previous = previous
         this.next = next
-        this.bodyVisible = holder.body.visibility == View.VISIBLE
+        this.bodyVisible = holder.containerView.findViewById<View>(R.id.body)?.visibility == View.VISIBLE
         this.data = message.parts.filter { !it.isSmil() && !it.isText() }
         this.audioState = audioState
     }

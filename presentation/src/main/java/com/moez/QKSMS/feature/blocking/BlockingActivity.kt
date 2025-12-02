@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with QKSMS.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.prauga.messages.feature.blocking
 
 import android.os.Bundle
@@ -23,20 +24,17 @@ import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
 import dagger.android.AndroidInjection
-import org.prauga.messages.R
 import org.prauga.messages.common.base.QkThemedActivity
 import org.prauga.messages.databinding.ContainerActivityBinding
 
-class BlockingActivity : QkThemedActivity() {
+class BlockingActivity :
+    QkThemedActivity<ContainerActivityBinding>(ContainerActivityBinding::inflate) {
 
     private lateinit var router: Router
-    private lateinit var binding: ContainerActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        binding = ContainerActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         router = Conductor.attachRouter(this, binding.container, savedInstanceState)
         if (!router.hasRootController()) {
@@ -49,5 +47,4 @@ class BlockingActivity : QkThemedActivity() {
             super.onBackPressed()
         }
     }
-
 }

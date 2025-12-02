@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with QKSMS.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.prauga.messages.feature.settings
 
 import android.os.Bundle
@@ -23,20 +24,18 @@ import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
 import dagger.android.AndroidInjection
-import org.prauga.messages.R
 import org.prauga.messages.common.base.QkThemedActivity
-import kotlinx.android.synthetic.main.container_activity.*
+import org.prauga.messages.databinding.ContainerActivityBinding
 
-class SettingsActivity : QkThemedActivity() {
+class SettingsActivity : QkThemedActivity<ContainerActivityBinding>(ContainerActivityBinding::inflate) {
 
     private lateinit var router: Router
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.container_activity)
 
-        router = Conductor.attachRouter(this, container, savedInstanceState)
+        router = Conductor.attachRouter(this, binding.container, savedInstanceState)
         if (!router.hasRootController()) {
             router.setRoot(RouterTransaction.with(SettingsController()))
         }
@@ -47,5 +46,4 @@ class SettingsActivity : QkThemedActivity() {
             super.onBackPressed()
         }
     }
-
 }
