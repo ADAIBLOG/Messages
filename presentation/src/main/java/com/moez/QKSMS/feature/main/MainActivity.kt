@@ -72,6 +72,7 @@ import org.prauga.messages.manager.ChangelogManager
 import org.prauga.messages.repository.SyncRepository
 import javax.inject.Inject
 import androidx.core.view.size
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::inflate), MainView {
 
@@ -187,6 +188,25 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
 
         itemTouchCallback.adapter = conversationsAdapter
         conversationsAdapter.autoScrollToStart(binding.recyclerView)
+
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy > 0 && binding.cVTopBar2.translationY == 0f) {
+                    // Hide
+                    val translationY = -binding.cVTopBar2.height.toFloat() - 8f * resources.displayMetrics.density
+                    binding.cVTopBar1.animate().translationY(translationY).setDuration(200).start()
+                    binding.cVTopBar2.animate().translationY(translationY).setDuration(200).start()
+                    binding.cVTopBar3.animate().translationY(translationY).setDuration(200).start()
+                } else if (dy < 0 && binding.cVTopBar2.translationY != 0f) {
+                    // Show
+                    binding.cVTopBar1.animate().translationY(0f).setDuration(200).start()
+                    binding.cVTopBar2.animate().translationY(0f).setDuration(200).start()
+                    binding.cVTopBar3.animate().translationY(0f).setDuration(200).start()
+                }
+            }
+        })
 
         // Don't allow clicks to pass through the drawer layout
         binding.drawer.root.clicks().autoDisposable(scope()).subscribe()

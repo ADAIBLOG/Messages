@@ -119,7 +119,6 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cVTopBar2"
             android:layout_width="100dp"
