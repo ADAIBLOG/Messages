@@ -149,5 +149,15 @@ class ConversationsAdapter @Inject constructor(
         disposables.clear()
     }
 
+    /**
+     * Public method to start selection mode by selecting the first item
+     */
+    fun startSelectionMode() {
+        if (itemCount > 0) {
+            val firstId = getItemId(0)
+            toggleSelection(firstId, force = true)
+            notifyItemChanged(0)
+        }
+    }
 
 }

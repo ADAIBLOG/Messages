@@ -37,10 +37,12 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
+import androidx.core.view.size
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.textChanges
@@ -71,8 +73,7 @@ import org.prauga.messages.feature.conversations.ConversationsAdapter
 import org.prauga.messages.manager.ChangelogManager
 import org.prauga.messages.repository.SyncRepository
 import javax.inject.Inject
-import androidx.core.view.size
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.view.get
 
 class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::inflate), MainView {
 
@@ -180,6 +181,12 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             homeIntent.onNext(Unit)
         }
 
+        binding.cVTopBar1.clicks()
+            .autoDisposable(scope())
+            .subscribe {
+                showEditMenu()
+            }
+
         binding.cVTopBar3.clicks()
             .autoDisposable(scope())
             .subscribe {
@@ -195,7 +202,8 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
 
                 if (dy > 0 && binding.cVTopBar2.translationY == 0f) {
                     // Hide
-                    val translationY = -binding.cVTopBar2.height.toFloat() - 8f * resources.displayMetrics.density
+                    val translationY =
+                        -binding.cVTopBar2.height.toFloat() - 8f * resources.displayMetrics.density
                     binding.cVTopBar1.animate().translationY(translationY).setDuration(200).start()
                     binding.cVTopBar2.animate().translationY(translationY).setDuration(200).start()
                     binding.cVTopBar3.animate().translationY(translationY).setDuration(200).start()
@@ -599,6 +607,40 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             binding.toolbarSearch.requestFocus()
     }
 
+    private fun showEditMenu() {
+        val popup = PopupMenu(this, binding.cVTopBar1, Gravity.START, 0, R.style.DrawerPopupMenu)
+        popup.menuInflater.inflate(R.menu.edit_menu, popup.menu)
+
+        try {
+            val fieldMPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+            fieldMPopup.isAccessible = true
+            val mPopup = fieldMPopup.get(popup)
+            mPopup.javaClass
+                .getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                .invoke(mPopup, true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val iconColor = resolveThemeColor(android.R.attr.textColorPrimary)
+        for (i in 0 until popup.menu.size) {
+            val menuItem = popup.menu[i]
+            menuItem.icon?.setTint(iconColor)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_select_messages -> {
+                     conversationsAdapter.startSelectionMode()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        popup.show()
+    }
+
     private fun showDrawerMenu() {
         val popup = PopupMenu(this, binding.cVTopBar3, Gravity.END, 0, R.style.DrawerPopupMenu)
         popup.menuInflater.inflate(R.menu.drawer_menu, popup.menu)
@@ -616,7 +658,7 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
 
         val iconColor = resolveThemeColor(android.R.attr.textColorPrimary)
         for (i in 0 until popup.menu.size) {
-            val menuItem = popup.menu.getItem(i)
+            val menuItem = popup.menu[i]
             menuItem.icon?.setTint(iconColor)
         }
 
