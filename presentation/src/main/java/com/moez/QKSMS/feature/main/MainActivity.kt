@@ -33,6 +33,7 @@ import android.view.ViewStub
 import android.widget.ProgressBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
@@ -46,6 +47,10 @@ import com.jakewharton.rxbinding2.widget.textChanges
 import com.uber.autodispose.android.lifecycle.scope
 import com.uber.autodispose.autoDisposable
 import dagger.android.AndroidInjection
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.prauga.messages.R
 import org.prauga.messages.common.Navigator
 import org.prauga.messages.common.androidxcompat.drawerOpen
@@ -65,22 +70,34 @@ import org.prauga.messages.feature.conversations.ConversationItemTouchCallback
 import org.prauga.messages.feature.conversations.ConversationsAdapter
 import org.prauga.messages.manager.ChangelogManager
 import org.prauga.messages.repository.SyncRepository
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 import javax.inject.Inject
+import androidx.core.view.size
 
 class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::inflate), MainView {
 
-    @Inject lateinit var blockingDialog: BlockingDialog
-    @Inject lateinit var disposables: CompositeDisposable
-    @Inject lateinit var navigator: Navigator
-    @Inject lateinit var conversationsAdapter: ConversationsAdapter
-    @Inject lateinit var drawerBadgesExperiment: DrawerBadgesExperiment
-    @Inject lateinit var searchAdapter: SearchAdapter
-    @Inject lateinit var itemTouchCallback: ConversationItemTouchCallback
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var blockingDialog: BlockingDialog
+
+    @Inject
+    lateinit var disposables: CompositeDisposable
+
+    @Inject
+    lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var conversationsAdapter: ConversationsAdapter
+
+    @Inject
+    lateinit var drawerBadgesExperiment: DrawerBadgesExperiment
+
+    @Inject
+    lateinit var searchAdapter: SearchAdapter
+
+    @Inject
+    lateinit var itemTouchCallback: ConversationItemTouchCallback
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override val onNewIntentIntent: Subject<Intent> = PublishSubject.create()
     override val activityResumedIntent: Subject<Boolean> = PublishSubject.create()
@@ -90,8 +107,11 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
         binding.drawerLayout.drawerOpen(Gravity.START)
     }
     override val homeIntent: Subject<Unit> = PublishSubject.create()
+
+    private val menuClickSubject: Subject<Unit> = PublishSubject.create()
     override val navigationIntent: Observable<NavItem> by lazy {
-        Observable.merge(listOf(
+        Observable.merge(
+            listOf(
                 backPressedSubject,
                 binding.drawer.inbox.clicks().map { NavItem.INBOX },
                 binding.drawer.archived.clicks().map { NavItem.ARCHIVED },
@@ -101,10 +121,12 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
                 binding.drawer.settings.clicks().map { NavItem.SETTINGS },
 //                plus.clicks().map { NavItem.PLUS },
 //                help.clicks().map { NavItem.HELP },
-                binding.drawer.invite.clicks().map { NavItem.INVITE }))
+                binding.drawer.invite.clicks().map { NavItem.INVITE })
+        )
     }
     override val optionsItemIntent: Subject<Int> = PublishSubject.create()
-//    override val plusBannerIntent by lazy { plusBanner.clicks() }
+
+    //    override val plusBannerIntent by lazy { plusBanner.clicks() }
     override val dismissRatingIntent by lazy { binding.drawer.rateDismiss.clicks() }
     override val rateIntent by lazy { binding.drawer.rateOkay.clicks() }
     override val conversationsSelectedIntent by lazy { conversationsAdapter.selectionChanges }
@@ -139,8 +161,8 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
 
         (binding.snackbar as? ViewStub)?.setOnInflateListener { _, inflated ->
             inflated.findViewById<View>(R.id.snackbarButton).clicks()
-                    .autoDisposable(scope(Lifecycle.Event.ON_DESTROY))
-                    .subscribe(snackbarButtonIntent)
+                .autoDisposable(scope(Lifecycle.Event.ON_DESTROY))
+                .subscribe(snackbarButtonIntent)
         }
 
         (binding.syncing as? ViewStub)?.setOnInflateListener { _, inflated ->
@@ -157,6 +179,12 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             homeIntent.onNext(Unit)
         }
 
+        binding.cVTopBar3.clicks()
+            .autoDisposable(scope())
+            .subscribe {
+                showDrawerMenu()
+            }
+
         itemTouchCallback.adapter = conversationsAdapter
         conversationsAdapter.autoScrollToStart(binding.recyclerView)
 
@@ -165,41 +193,50 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
 
         // Set the theme color tint to the recyclerView, progressbar, and FAB
         theme
-                .autoDisposable(scope())
-                .subscribe { theme ->
-                    // Set the color for the drawer icons
-                    val states = arrayOf(
-                            intArrayOf(android.R.attr.state_activated),
-                            intArrayOf(-android.R.attr.state_activated))
+            .autoDisposable(scope())
+            .subscribe { theme ->
+                // Set the color for the drawer icons
+                val states = arrayOf(
+                    intArrayOf(android.R.attr.state_activated),
+                    intArrayOf(-android.R.attr.state_activated)
+                )
 
-                    ColorStateList(states, intArrayOf(theme.theme,
+                ColorStateList(
+                    states, intArrayOf(
+                        theme.theme,
                         resolveThemeColor(android.R.attr.textColorSecondary)
-                    ))
-                        .let { tintList ->
-                            binding.drawer.inboxIcon.imageTintList = tintList
-                            binding.drawer.archivedIcon.imageTintList = tintList
-                        }
-
-                    // Miscellaneous views
-                    listOf(binding.drawer.plusBadge1, binding.drawer.plusBadge2).forEach { badge ->
-                        badge.setBackgroundTint(theme.theme)
-                        badge.setTextColor(theme.textPrimary)
+                    )
+                )
+                    .let { tintList ->
+                        binding.drawer.inboxIcon.imageTintList = tintList
+                        binding.drawer.archivedIcon.imageTintList = tintList
                     }
-                    (binding.syncing as? ViewStub)?.findViewById<ProgressBar>(R.id.syncingProgress)?.let {
+
+                // Miscellaneous views
+                listOf(binding.drawer.plusBadge1, binding.drawer.plusBadge2).forEach { badge ->
+                    badge.setBackgroundTint(theme.theme)
+                    badge.setTextColor(theme.textPrimary)
+                }
+                (binding.syncing as? ViewStub)?.findViewById<ProgressBar>(R.id.syncingProgress)
+                    ?.let {
                         it.progressTintList = ColorStateList.valueOf(theme.theme)
                         it.indeterminateTintList = ColorStateList.valueOf(theme.theme)
                     }
-                    binding.drawer.plusIcon.setTint(theme.theme)
-                    binding.drawer.rateIcon.setTint(theme.theme)
+                binding.drawer.plusIcon.setTint(theme.theme)
+                binding.drawer.rateIcon.setTint(theme.theme)
 
-                    val primaryTextColor = resolveThemeColor(android.R.attr.textColorPrimary)
-                    val secondaryTextColor = resolveThemeColor(android.R.attr.textColorSecondary)
-                    binding.searchIcon.setTint(primaryTextColor)
-                    binding.toolbarSearch.setTextColor(primaryTextColor)
-                    binding.toolbarSearch.setHintTextColor(secondaryTextColor)
+                val primaryTextColor = resolveThemeColor(android.R.attr.textColorPrimary)
+                val secondaryTextColor = resolveThemeColor(android.R.attr.textColorSecondary)
+                binding.searchIcon.setTint(primaryTextColor)
+                binding.toolbarSearch.setTextColor(primaryTextColor)
+                binding.toolbarSearch.setHintTextColor(secondaryTextColor)
 
-                    binding.compose.setTint(primaryTextColor)
-                }
+                binding.editText.setTextColor(primaryTextColor)
+                binding.messagesText.setTextColor(primaryTextColor)
+                binding.menuIcon.setTint(primaryTextColor)
+
+                binding.compose.setTint(primaryTextColor)
+            }
     }
 
     override fun onNewIntent(intent: Intent?) =
@@ -238,9 +275,17 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             else -> 0
         }
 
-        binding.toolbarSearch.setVisible(state.page is Inbox &&
-                state.page.selected == 0 ||
-                state.page is Searching
+        val hasSelection = selectedConversations > 0
+        binding.toolbar.setVisible(hasSelection)
+
+        binding.cVTopBar1.setVisible(!hasSelection)
+        binding.cVTopBar2.setVisible(!hasSelection)
+        binding.cVTopBar3.setVisible(!hasSelection)
+
+        binding.toolbarSearch.setVisible(
+            state.page is Inbox &&
+                    state.page.selected == 0 ||
+                    state.page is Searching
         )
         binding.toolbarTitle.setVisible(true)
 
@@ -255,9 +300,9 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             findItem(R.id.add)?.isVisible = addContact && selectedConversations != 0
             findItem(R.id.pin)?.isVisible = markPinned && selectedConversations != 0
             findItem(R.id.unpin)?.isVisible = !markPinned && selectedConversations != 0
-            findItem(R.id.read)?.isVisible = ( markRead && selectedConversations != 0 ) ||
+            findItem(R.id.read)?.isVisible = (markRead && selectedConversations != 0) ||
                     selectedConversations > 1
-            findItem(R.id.unread)?.isVisible = ( !markRead && selectedConversations != 0 ) ||
+            findItem(R.id.unread)?.isVisible = (!markRead && selectedConversations != 0) ||
                     selectedConversations > 1
             findItem(R.id.block)?.isVisible = selectedConversations != 0
             findItem(R.id.rename)?.isVisible = selectedConversations == 1
@@ -280,7 +325,11 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             is Inbox -> {
                 showBackButton(state.page.selected > 0)
                 binding.toolbarTitle.text = when {
-                    state.page.selected > 0 -> getString(R.string.main_title_selected, state.page.selected)
+                    state.page.selected > 0 -> getString(
+                        R.string.main_title_selected,
+                        state.page.selected
+                    )
+
                     else -> getString(R.string.app_name)
                 }
                 if (binding.recyclerView.adapter !== conversationsAdapter)
@@ -293,7 +342,8 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             is Searching -> {
                 showBackButton(true)
                 binding.toolbarTitle.text = getString(R.string.title_conversations)
-                if (binding.recyclerView.adapter !== searchAdapter) binding.recyclerView.adapter = searchAdapter
+                if (binding.recyclerView.adapter !== searchAdapter) binding.recyclerView.adapter =
+                    searchAdapter
                 searchAdapter.data = state.page.data ?: listOf()
                 itemTouchHelper.attachToRecyclerView(null)
                 binding.empty.setText(R.string.inbox_search_empty_text)
@@ -302,7 +352,11 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             is Archived -> {
                 showBackButton(state.page.selected > 0)
                 binding.toolbarTitle.text = when {
-                    state.page.selected > 0 -> getString(R.string.main_title_selected, state.page.selected)
+                    state.page.selected > 0 -> getString(
+                        R.string.main_title_selected,
+                        state.page.selected
+                    )
+
                     else -> getString(R.string.title_archived)
                 }
                 if (binding.recyclerView.adapter !== conversationsAdapter)
@@ -338,7 +392,12 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
                 binding.syncing.isVisible = true
                 findViewById<ProgressBar>(R.id.syncingProgress)?.let { progress ->
                     progress.max = state.syncing.max
-                    ObjectAnimator.ofInt(progress, "progress", progress.progress, state.syncing.progress).start()
+                    ObjectAnimator.ofInt(
+                        progress,
+                        "progress",
+                        progress.progress,
+                        state.syncing.progress
+                    ).start()
                     progress.isIndeterminate = state.syncing.indeterminate
                 }
                 binding.snackbar.isVisible = false
@@ -455,7 +514,11 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
                     conversations.size
                 )
             )
-            .setPositiveButton(R.string.button_delete) { _, _ -> confirmDeleteIntent.onNext(conversations) }
+            .setPositiveButton(R.string.button_delete) { _, _ ->
+                confirmDeleteIntent.onNext(
+                    conversations
+                )
+            }
             .setNegativeButton(R.string.button_cancel, null)
             .show()
     }
@@ -476,9 +539,17 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
         Snackbar.make(
             binding.drawerLayout,
             if (isArchiving) {
-                resources.getQuantityString(R.plurals.toast_archived, countConversationsArchived, countConversationsArchived)
+                resources.getQuantityString(
+                    R.plurals.toast_archived,
+                    countConversationsArchived,
+                    countConversationsArchived
+                )
             } else {
-                resources.getQuantityString(R.plurals.toast_unarchived, countConversationsArchived, countConversationsArchived)
+                resources.getQuantityString(
+                    R.plurals.toast_unarchived,
+                    countConversationsArchived,
+                    countConversationsArchived
+                )
             },
             if (countConversationsArchived < 10) Snackbar.LENGTH_LONG
             else Snackbar.LENGTH_INDEFINITE
@@ -506,5 +577,70 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
                 binding.drawer.inbox.requestFocus()
         } else
             binding.toolbarSearch.requestFocus()
+    }
+
+    private fun showDrawerMenu() {
+        val popup = PopupMenu(this, binding.cVTopBar3, Gravity.END, 0, R.style.DrawerPopupMenu)
+        popup.menuInflater.inflate(R.menu.drawer_menu, popup.menu)
+
+        try {
+            val fieldMPopup = PopupMenu::class.java.getDeclaredField("mPopup")
+            fieldMPopup.isAccessible = true
+            val mPopup = fieldMPopup.get(popup)
+            mPopup.javaClass
+                .getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                .invoke(mPopup, true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val iconColor = resolveThemeColor(android.R.attr.textColorPrimary)
+        for (i in 0 until popup.menu.size) {
+            val menuItem = popup.menu.getItem(i)
+            menuItem.icon?.setTint(iconColor)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_inbox -> {
+                    backPressedSubject.onNext(NavItem.INBOX)
+                    true
+                }
+
+                R.id.menu_archived -> {
+                    backPressedSubject.onNext(NavItem.ARCHIVED)
+                    true
+                }
+
+                R.id.menu_backup -> {
+                    backPressedSubject.onNext(NavItem.BACKUP)
+                    true
+                }
+
+                R.id.menu_scheduled -> {
+                    backPressedSubject.onNext(NavItem.SCHEDULED)
+                    true
+                }
+
+                R.id.menu_blocking -> {
+                    backPressedSubject.onNext(NavItem.BLOCKING)
+                    true
+                }
+
+                R.id.menu_settings -> {
+                    backPressedSubject.onNext(NavItem.SETTINGS)
+                    true
+                }
+
+//                R.id.menu_invite -> {
+//                    backPressedSubject.onNext(NavItem.INVITE)
+//                    true
+//                }
+
+                else -> false
+            }
+        }
+
+        popup.show()
     }
 }

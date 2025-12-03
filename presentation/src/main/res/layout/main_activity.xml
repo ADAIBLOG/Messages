@@ -40,6 +40,7 @@
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
             android:translationZ="8dp"
+            android:visibility="gone"
             app:contentInsetLeft="0dp"
             app:contentInsetRight="0dp"
             app:contentInsetStartWithNavigation="0dp"
@@ -81,53 +82,116 @@
             tools:text="Your conversations will appear here"
             tools:visibility="invisible" />
 
-        <!--        <com.google.android.material.card.MaterialCardView-->
-        <!--            android:id="@+id/cVTopBar"-->
-        <!--            android:layout_width="0dp"-->
-        <!--            android:layout_height="52dp"-->
-        <!--            android:layout_marginStart="25dp"-->
-        <!--            android:layout_marginEnd="12dp"-->
-        <!--            android:layout_marginBottom="12dp"-->
-        <!--            app:cardBackgroundColor="@color/frost_surface"-->
-        <!--            app:cardCornerRadius="26dp"-->
-        <!--            app:cardElevation="6dp"-->
-        <!--            app:cardUseCompatPadding="false"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintTop_toBottomOf="@id/toolbar">-->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cVTopBar1"
+            android:layout_width="60dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/frost_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="6dp"
+            app:cardUseCompatPadding="false"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <!--            <androidx.constraintlayout.widget.ConstraintLayout-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="match_parent"-->
-        <!--                android:paddingStart="16dp"-->
-        <!--                android:paddingEnd="16dp">-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <!--                <ImageView-->
-        <!--                    android:id="@+id/searchIconn"-->
-        <!--                    android:layout_width="24dp"-->
-        <!--                    android:layout_height="24dp"-->
-        <!--                    android:contentDescription="@string/title_conversations"-->
-        <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-        <!--                    app:layout_constraintTop_toTopOf="parent"-->
-        <!--                    app:srcCompat="@drawable/ic_filter"-->
-        <!--                    app:tint="?attr/colorOnSurface" />-->
+                <org.prauga.messages.common.widget.QkTextView
+                    android:id="@+id/editText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:text="Edit"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--&lt;!&ndash;                <org.prauga.messages.common.widget.QkEditText&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:id="@+id/toolbarSearchn"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:background="@android:color/transparent"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:hint="@string/title_conversations"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:maxLines="1"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    android:paddingStart="8dp"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    app:layout_constraintBottom_toBottomOf="parent"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    app:layout_constraintEnd_toEndOf="parent"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    app:layout_constraintStart_toEndOf="@id/searchIcon"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    app:layout_constraintTop_toTopOf="parent" />&ndash;&gt;-->
-        <!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+        </com.google.android.material.card.MaterialCardView>
 
 
-        <!--        </com.google.android.material.card.MaterialCardView>-->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cVTopBar2"
+            android:layout_width="100dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="26dp"
+            app:cardUseCompatPadding="false"
+            app:layout_constraintEnd_toStartOf="@id/cVTopBar3"
+            app:layout_constraintStart_toEndOf="@id/cVTopBar1"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <org.prauga.messages.common.widget.QkTextView
+                    android:id="@+id/messagesText"
+                    style="@style/TextPrimary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:text="@string/app_name"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cVTopBar3"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/frost_surface"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="6dp"
+            app:cardUseCompatPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/menuIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/main_drawer_open_cd"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_filter"
+                    app:tint="?attr/colorOnSurface" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
