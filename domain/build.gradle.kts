@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.javax.annotation.api)
 
     // realm
-    kapt(libs.realm.annotations)
+    implementation(libs.realm.android.library)
     kapt(libs.realm.annotations.processor)
 
     // rxjava
