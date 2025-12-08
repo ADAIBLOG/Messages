@@ -37,6 +37,8 @@ import org.prauga.messages.interactor.MigratePreferences
 import org.prauga.messages.interactor.SpeakThreads
 import org.prauga.messages.interactor.SyncContacts
 import org.prauga.messages.interactor.SyncMessages
+import org.prauga.messages.feature.main.ConversationFilterType.ALL
+import org.prauga.messages.feature.main.ConversationFilterType.UNREAD
 import org.prauga.messages.listener.ContactAddedListener
 import org.prauga.messages.manager.BillingManager
 import org.prauga.messages.manager.ChangelogManager
@@ -85,9 +87,29 @@ class MainViewModel @Inject constructor(
     private val syncContacts: SyncContacts,
     private val syncMessages: SyncMessages
 ) : QkViewModel<MainView, MainState>(
-    MainState(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get())))
+    MainState(
+        page = Inbox(
+            data = conversationRepo.getConversations(
+                prefs.unreadAtTop.get(),
+                onlyUnread = false
+            )
+        ),
+        currentFilter = ALL
+    )
 ) {
     private var lastArchivedThreadIds = listOf<Long>(0)
+    private fun inboxData(filter: ConversationFilterType) =
+        conversationRepo.getConversations(
+            prefs.unreadAtTop.get(),
+            onlyUnread = filter == UNREAD
+        )
+
+    private fun archivedData(filter: ConversationFilterType) =
+        conversationRepo.getConversations(
+            prefs.unreadAtTop.get(),
+            archived = true,
+            onlyUnread = filter == UNREAD
+        )
 
     init {
         disposables += deleteConversations
@@ -162,11 +184,11 @@ class MainViewModel @Inject constructor(
             .withLatestFrom(state) { _, state ->
                 if (state.page is Inbox)
                     newState {
-                        copy(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get())))
+                        copy(page = Inbox(data = inboxData(currentFilter)))
                     }
                 else if (state.page is Archived)
                     newState {
-                        copy(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get(), true)))
+                        copy(page = Archived(data = archivedData(currentFilter)))
                     }
             }
             .autoDisposable(view.scope())
@@ -266,7 +288,7 @@ class MainViewModel @Inject constructor(
                 .map { query -> query.trim() }
                 .withLatestFrom(state) { query, state ->
                     if (query.isEmpty() && state.page is Searching) {
-                        newState { copy(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get()))) }
+                        newState { copy(page = Inbox(data = inboxData(currentFilter))) }
                     }
                     query
                 }
@@ -282,6 +304,19 @@ class MainViewModel @Inject constructor(
                 .map(conversationRepo::searchConversations)
                 .autoDisposable(view.scope())
                 .subscribe { data -> newState { copy(page = Searching(loading = false, data = data)) } }
+
+        view.filterSelectedIntent
+            .distinctUntilChanged()
+            .withLatestFrom(state) { filter, state -> Pair(filter, state.page) }
+            .autoDisposable(view.scope())
+            .subscribe { (filter, page) ->
+                val updatedPage = when (page) {
+                    is Inbox -> page.copy(data = inboxData(filter))
+                    is Archived -> page.copy(data = archivedData(filter))
+                    else -> page
+                }
+                newState { copy(currentFilter = filter, page = updatedPage) }
+            }
 
         view.activityResumedIntent
                 .filter { resumed -> !resumed }
@@ -332,7 +367,7 @@ class MainViewModel @Inject constructor(
                             state.page is Inbox && state.page.selected > 0 -> view.clearSelection()
                             state.page is Archived && state.page.selected > 0 -> view.clearSelection()
                             state.page !is Inbox -> {
-                                newState { copy(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get()))) }
+                                newState { copy(page = Inbox(data = inboxData(currentFilter))) }
                             }
                             else -> newState { copy(hasError = true) }
                         }
@@ -350,8 +385,8 @@ class MainViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .doOnNext { drawerItem ->
                     when (drawerItem) {
-                        NavItem.INBOX -> newState { copy(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get()))) }
-                        NavItem.ARCHIVED -> newState { copy(page = Archived(data = conversationRepo.getConversations(prefs.unreadAtTop.get(), true))) }
+                        NavItem.INBOX -> newState { copy(page = Inbox(data = inboxData(currentFilter))) }
+                        NavItem.ARCHIVED -> newState { copy(page = Archived(data = archivedData(currentFilter))) }
                         else -> Unit
                     }
                 }

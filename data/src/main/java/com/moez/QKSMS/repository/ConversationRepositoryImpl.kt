@@ -54,7 +54,11 @@ class ConversationRepositoryImpl @Inject constructor(
     private val phoneNumberUtils: PhoneNumberUtils
 ) : ConversationRepository {
 
-    override fun getConversations(unreadAtTop: Boolean, archived: Boolean): RealmResults<Conversation> {
+    override fun getConversations(
+        unreadAtTop: Boolean,
+        archived: Boolean,
+        onlyUnread: Boolean
+    ): RealmResults<Conversation> {
         val sortOrder: MutableList<String> = arrayListOf("pinned", "draft", "lastMessage.date")
         val sortDirections: MutableList<Sort> = arrayListOf(Sort.DESCENDING, Sort.DESCENDING, Sort.DESCENDING)
 
@@ -63,7 +67,8 @@ class ConversationRepositoryImpl @Inject constructor(
             sortDirections.add(0, Sort.ASCENDING)
         }
 
-        return Realm.getDefaultInstance()
+        val realm = Realm.getDefaultInstance()
+        val query = realm
             .where(Conversation::class.java)
             .notEqualTo("id", 0L)
             .equalTo("archived", archived)
@@ -74,10 +79,12 @@ class ConversationRepositoryImpl @Inject constructor(
             .or()
             .isNotEmpty("draft")
             .endGroup()
-            .sort(
-                sortOrder.toTypedArray(),
-                sortDirections.toTypedArray()
-            )
+        if (onlyUnread) {
+            query.equalTo("lastMessage.read", false)
+        }
+
+        return query
+            .sort(sortOrder.toTypedArray(), sortDirections.toTypedArray())
             .findAllAsync()
     }
 

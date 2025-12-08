@@ -27,7 +27,11 @@ import io.realm.RealmResults
 
 interface ConversationRepository {
 
-    fun getConversations(unreadAtTop: Boolean, archived: Boolean = false): RealmResults<Conversation>
+    fun getConversations(
+        unreadAtTop: Boolean,
+        archived: Boolean = false,
+        onlyUnread: Boolean = false
+    ): RealmResults<Conversation>
 
     fun getConversationsSnapshot(unreadAtTop: Boolean): List<Conversation>
 

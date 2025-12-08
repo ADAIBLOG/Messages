@@ -34,6 +34,7 @@ data class MainState(
     val smsPermission: Boolean = true,
     val contactPermission: Boolean = true,
     val notificationPermission: Boolean = true,
+    val currentFilter: ConversationFilterType = ConversationFilterType.ALL,
 )
 
 sealed class MainPage
@@ -58,3 +59,5 @@ data class Archived(
     val data: RealmResults<Conversation>? = null,
     val selected: Int = 0
 ) : MainPage()
+
+enum class ConversationFilterType { ALL, UNREAD }

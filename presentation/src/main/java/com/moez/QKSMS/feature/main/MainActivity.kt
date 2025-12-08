@@ -105,6 +105,12 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
     override val activityResumedIntent: Subject<Boolean> = PublishSubject.create()
     override val queryChangedIntent by lazy { binding.toolbarSearch.textChanges() }
     override val composeIntent by lazy { binding.compose.clicks() }
+    override val filterSelectedIntent by lazy {
+        Observable.merge(
+            binding.filterAll.clicks().map { ConversationFilterType.ALL },
+            binding.filterUnread.clicks().map { ConversationFilterType.UNREAD }
+        )
+    }
     override val drawerToggledIntent: Observable<Boolean> by lazy {
         binding.drawerLayout.drawerOpen(Gravity.START)
     }
@@ -289,6 +295,7 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
             binding.empty.setVisible(false)
             binding.searchPill.setVisible(false)
             binding.compose.setVisible(false)
+            binding.filterGroup.setVisible(false)
             return
         } else {
             binding.notDefaultSmsView.setVisible(false)
@@ -331,6 +338,7 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
                     state.page is Searching
         )
         binding.toolbarTitle.setVisible(true)
+        binding.filterGroup.setVisible(state.page is Inbox || state.page is Archived)
 
         binding.toolbar.menu.apply {
             findItem(R.id.select_all)?.isVisible =
@@ -413,6 +421,9 @@ class MainActivity : QkThemedActivity<MainActivityBinding>(MainActivityBinding::
                 binding.toolbarTitle.text = getString(R.string.app_name)
             }
         }
+
+        binding.filterAll.isChecked = state.currentFilter == ConversationFilterType.ALL
+        binding.filterUnread.isChecked = state.currentFilter == ConversationFilterType.UNREAD
 
         binding.drawer.inbox.isActivated = state.page is Inbox
         binding.drawer.archived.isActivated = state.page is Archived

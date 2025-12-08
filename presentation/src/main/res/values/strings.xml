@@ -59,6 +59,8 @@
     <string name="main_menu_send_now">Send now</string>
     <string name="main_menu_edit_message">Edit message</string>
     <string name="main_menu_rename_conversation">Rename conversation</string>
+    <string name="main_filter_all">All</string>
+    <string name="main_filter_unread">Unread</string>
     <string name="main_syncing">Syncing messages…</string>
     <string name="main_sender_you">You: %s</string>
     <string name="main_sender_draft">Draft: %s</string>
