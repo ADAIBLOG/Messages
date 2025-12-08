@@ -1,0 +1,15 @@
+Messages is an open source replacement to the stock messaging app. It is a continuation of QUIK 
+
+## Features
+- Intuitive UI
+- Scheduled Messages
+- Message Backup
+- Message Blocking and Archiving
+- Voice Messages
+- Attachments of any type of file
+- Message Sorting
+- Delayed Sending
+- Message Filtering
+- Automatic OTP Detection
+
+You can chat with the community over at <a href="https://t.me/Pvot_OS">@Pvot_OS:Telegram</a>

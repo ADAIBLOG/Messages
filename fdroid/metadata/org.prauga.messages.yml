@@ -1,0 +1,18 @@
+PackageName: org.prauga.messages
+Name: Messages
+Summary: A fast messaging app designed to make conversations simple and effortless
+License: GPL-3.0
+AuthorName: Saalim Quadri
+SourceCode: https://github.com/danascape/Messages
+IssueTracker: https://github.com/danascape/Messages/issues
+WebSite: ""
+Categories:
+  - Communication
+  - Internet
+AntiFeatures: NonFreeNet
+CurrentVersion: "1.0.2"
+CurrentVersionCode: 3
+Description: |
+  Messages is an open source replacement for the stock messaging app on Android.
+  It displays SMS/MMS conversations, supports OTP Detection, message filtering,
+  scheduled sends, backups, voice messages and more.
