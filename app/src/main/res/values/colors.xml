@@ -35,4 +35,6 @@
     <color name="ic_launcher">#ffffff</color>
     <color name="ic_launcher_background">#0A84FF</color>
 
+    <!-- Swipe action color -->
+    <color name="swipe_delete">#E53935</color>
 </resources>

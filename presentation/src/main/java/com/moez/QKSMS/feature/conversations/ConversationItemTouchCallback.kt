@@ -55,6 +55,7 @@ class ConversationItemTouchCallback @Inject constructor(
     var adapter: RecyclerView.Adapter<*>? = null
 
     private val backgroundPaint = Paint()
+    private val leftBackgroundPaint = Paint()
     private var rightAction = 0
     private var swipeRightIcon: Bitmap? = null
     private var leftAction = 0
@@ -63,8 +64,12 @@ class ConversationItemTouchCallback @Inject constructor(
     private val iconLength = 24.dpToPx(context)
 
     init {
+        leftBackgroundPaint.color = context.resources.getColor(R.color.swipe_delete, null)
+
         disposables += colors.themeObservable()
-                .doOnNext { theme -> backgroundPaint.color = theme.theme }
+                .doOnNext { theme ->
+                    backgroundPaint.color = theme.theme
+                }
                 .subscribeOn(Schedulers.io())
                 .subscribe()
 
@@ -117,7 +122,7 @@ class ConversationItemTouchCallback @Inject constructor(
                 }
             } else if (dX < 0) {
                 c.drawRect(itemView.right.toFloat() + dX, itemView.top.toFloat(),
-                        itemView.right.toFloat(), itemView.bottom.toFloat(), backgroundPaint)
+                        itemView.right.toFloat(), itemView.bottom.toFloat(), leftBackgroundPaint)
 
                 swipeLeftIcon?.let { icon ->
                     val availablePx = -dX.toInt() - iconLength
