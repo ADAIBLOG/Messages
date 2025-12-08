@@ -24,6 +24,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.prauga.messages.R
 import org.prauga.messages.common.util.extensions.dpToPx
 import org.prauga.messages.common.util.extensions.setPadding
 import org.prauga.messages.injection.appComponent
@@ -46,13 +47,13 @@ class QkDialog @Inject constructor(private val context: Context, val adapter: Me
         recyclerView.adapter = adapter
         recyclerView.setPadding(top = 8.dpToPx(context), bottom = 8.dpToPx(context))
 
-        val dialog = AlertDialog.Builder(activity)
-                .setTitle(title)
-                .setView(recyclerView)
-                .create()
+        val dialog = AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
+            .setTitle(title)
+            .setView(recyclerView)
+            .create()
 
         val clicks = adapter.menuItemClicks
-                .subscribe { dialog.dismiss() }
+            .subscribe { dialog.dismiss() }
 
         dialog.setOnDismissListener {
             clicks.dispose()

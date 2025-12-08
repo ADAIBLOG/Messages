@@ -104,7 +104,7 @@ class BlockingManagerController : QkController<BlockingManagerView, BlockingMana
     override fun siaClicked(): Observable<*> = shouldIAnswer.clicks()
 
     override fun showCopyDialog(manager: String): Single<Boolean> = Single.create { emitter ->
-        AlertDialog.Builder(activity)
+        AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(R.string.blocking_manager_copy_title)
                 .setMessage(resources?.getString(R.string.blocking_manager_copy_summary, manager))
                 .setPositiveButton(R.string.button_continue) { _, _ -> emitter.onSuccess(true) }

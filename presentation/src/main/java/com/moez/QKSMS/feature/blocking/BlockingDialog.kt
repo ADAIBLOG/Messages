@@ -102,7 +102,7 @@ class BlockingDialog @Inject constructor(
 
         // Otherwise, show a dialog asking the user if they want to be directed to the external
         // blocking manager
-        AlertDialog.Builder(activity)
+        AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(when (block) {
                     true -> R.string.blocking_block_title
                     false -> R.string.blocking_unblock_title

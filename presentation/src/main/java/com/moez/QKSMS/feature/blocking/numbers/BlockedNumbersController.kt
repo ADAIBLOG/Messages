@@ -91,7 +91,7 @@ class BlockedNumbersController : QkController<BlockedNumbersView, BlockedNumbers
         val layout = LayoutInflater.from(activity).inflate(R.layout.blocked_numbers_add_dialog, null)
         val input = layout.findViewById<android.widget.EditText>(R.id.input)
         val textWatcher = BlockedNumberTextWatcher(input, phoneNumberUtils)
-        val dialog = AlertDialog.Builder(activity!!)
+        val dialog = AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setView(layout)
                 .setPositiveButton(R.string.blocked_numbers_dialog_block) { _, _ ->
                     saveAddressSubject.onNext(input.text.toString())

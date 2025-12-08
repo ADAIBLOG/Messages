@@ -542,7 +542,7 @@ class ComposeActivity : QkThemedActivity<ComposeActivityBinding>(ComposeActivity
     }
 
     override fun showDetails(details: String) {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.AppThemeDialog)
             .setTitle(R.string.compose_details_title)
             .setMessage(details)
             .setCancelable(true)
@@ -550,7 +550,7 @@ class ComposeActivity : QkThemedActivity<ComposeActivityBinding>(ComposeActivity
     }
 
     override fun showMessageLinkAskDialog(uri: Uri) {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.AppThemeDialog)
             .setTitle(R.string.messageLinkHandling_dialog_title)
             .setMessage(getString(R.string.messageLinkHandling_dialog_body, uri.toString()))
             .setPositiveButton(
@@ -685,7 +685,7 @@ class ComposeActivity : QkThemedActivity<ComposeActivityBinding>(ComposeActivity
 
     override fun showDeleteDialog(messages: List<Long>) {
         val count = messages.size
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.AppThemeDialog)
             .setTitle(R.string.dialog_delete_title)
             .setMessage(resources.getQuantityString(R.plurals.dialog_delete_chat, count, count))
             .setPositiveButton(R.string.button_delete) { _, _ -> confirmDeleteIntent.onNext(messages) }
@@ -694,7 +694,7 @@ class ComposeActivity : QkThemedActivity<ComposeActivityBinding>(ComposeActivity
     }
 
     override fun showClearCurrentMessageDialog() {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.AppThemeDialog)
             .setTitle(R.string.dialog_clear_compose_title)
             .setMessage(R.string.dialog_clear_compose)
             .setPositiveButton(R.string.button_clear) { _, _ ->

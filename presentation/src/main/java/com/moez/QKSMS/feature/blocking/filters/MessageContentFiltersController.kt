@@ -112,7 +112,7 @@ class MessageContentFiltersController : QkController<MessageContentFiltersView, 
                 caseSensitivity.isEnabled = !(regexp.findViewById<CompoundButton>(R.id.checkbox)?.isChecked ?: false)
             }
 
-        val dialog = AlertDialog.Builder(activity!!)
+        val dialog = AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setView(layout)
                 .setPositiveButton(R.string.message_content_filters_dialog_create) { _, _ ->
                     var text = input.text.toString();

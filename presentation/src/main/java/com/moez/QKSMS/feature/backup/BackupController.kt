@@ -82,7 +82,7 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
     private val documentSelectedSubject: Subject<Uri> = PublishSubject.create()
 
     private val stopRestoreDialog by lazy {
-        AlertDialog.Builder(activity!!)
+        AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(R.string.backup_restore_stop_title)
                 .setMessage(R.string.backup_restore_stop_message)
                 .setPositiveButton(R.string.button_stop, stopRestoreConfirmSubject)
@@ -92,7 +92,7 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
     }
 
     private val selectLocationRationaleDialog by lazy {
-        AlertDialog.Builder(activity!!)
+        AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(R.string.backup_select_location_rationale_title)
                 .setMessage(R.string.backup_select_location_rationale_message)
                 .setPositiveButton(R.string.button_continue, selectFolderConfirmSubject)
@@ -102,7 +102,7 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
     }
 
     private val selectedBackupErrorDialog by lazy {
-        AlertDialog.Builder(activity!!)
+        AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(R.string.backup_selected_backup_error_title)
                 .setMessage(R.string.backup_selected_backup_error_message)
                 .setPositiveButton(R.string.button_continue, restoreErrorConfirmSubject)
@@ -111,7 +111,7 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
     }
 
     private val selectedBackupDetailsDialog by lazy {
-        AlertDialog.Builder(activity!!)
+        AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(R.string.backup_selected_backup_details_title)
                 .setPositiveButton(R.string.backup_restore_title, confirmRestoreConfirmSubject)
                 .setNegativeButton(R.string.button_cancel, confirmRestoreCancelSubject)

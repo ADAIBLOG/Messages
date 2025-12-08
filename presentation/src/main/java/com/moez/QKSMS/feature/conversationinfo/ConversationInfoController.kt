@@ -134,11 +134,20 @@ class ConversationInfoController(
     }
 
     override fun showDeleteDialog() {
-        AlertDialog.Builder(activity!!)
+        val dialog = AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setTitle(R.string.dialog_delete_title)
                 .setMessage(resources?.getQuantityString(R.plurals.dialog_delete_message, 1))
                 .setPositiveButton(R.string.button_delete) { _, _ -> confirmDeleteSubject.onNext(Unit) }
                 .setNegativeButton(R.string.button_cancel, null)
-                .show()
+                .create()
+
+        dialog.show()
+
+        themedActivity?.theme?.take(1)
+                ?.autoDisposable(scope())
+                ?.subscribe { theme ->
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(theme.theme)
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(theme.theme)
+                }
     }
 }

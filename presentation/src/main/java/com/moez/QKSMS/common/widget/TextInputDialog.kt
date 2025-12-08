@@ -16,16 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with QKSMS.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.prauga.messages.common.widget
 
 import android.app.Activity
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import org.prauga.messages.R
+import org.prauga.messages.common.base.QkThemedActivity
 import org.prauga.messages.databinding.TextInputDialogBinding
 
-class TextInputDialog(context: Activity, hint: String, listener: (String) -> Unit) : AlertDialog(context) {
+class TextInputDialog(context: Activity, hint: String, listener: (String) -> Unit) :
+    AlertDialog(context, R.style.AppThemeDialog) {
 
     private val layout = TextInputDialogBinding.inflate(LayoutInflater.from(context))
 
@@ -33,10 +35,21 @@ class TextInputDialog(context: Activity, hint: String, listener: (String) -> Uni
         layout.field.hint = hint
 
         setView(layout.root)
-        setButton(DialogInterface.BUTTON_NEUTRAL, context.getString(R.string.button_cancel)) { _, _ -> }
-        setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.button_delete)) { _, _ -> listener("") }
-        setButton(DialogInterface.BUTTON_POSITIVE, context.getString(R.string.button_save)) { _, _ ->
+        setButton(BUTTON_NEUTRAL, context.getString(R.string.button_cancel)) { _, _ -> }
+        setButton(
+            BUTTON_NEGATIVE,
+            context.getString(R.string.button_delete)
+        ) { _, _ -> listener("") }
+        setButton(BUTTON_POSITIVE, context.getString(R.string.button_save)) { _, _ ->
             listener(layout.field.text.toString())
+        }
+
+        setOnShowListener {
+            (context as? QkThemedActivity<*>)?.colors?.theme()?.let { theme ->
+                getButton(BUTTON_NEUTRAL)?.setTextColor(theme.theme)
+                getButton(BUTTON_NEGATIVE)?.setTextColor(theme.theme)
+                getButton(BUTTON_POSITIVE)?.setTextColor(theme.theme)
+            }
         }
     }
 

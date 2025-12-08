@@ -38,7 +38,7 @@ class ChangelogDialog(activity: MainActivity) {
     init {
         val layout = ChangelogDialogBinding.inflate(LayoutInflater.from(activity))
 
-        dialog = AlertDialog.Builder(activity)
+        dialog = AlertDialog.Builder(activity!!, R.style.AppThemeDialog)
                 .setCancelable(true)
                 .setView(layout.root)
                 .create()

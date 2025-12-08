@@ -46,17 +46,22 @@
     </style>
 
     <style name="AppThemeDialog" parent="Theme.AppCompat.Dialog">
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="android:textColorTertiary">@color/text_tertiary</item>
+        <item name="android:textColorPrimary">@color/textPrimaryDark</item>
+        <item name="android:textColorSecondary">@color/textSecondaryDark</item>
+        <item name="android:textColorTertiary">@color/textTertiaryDark</item>
         <item name="android:windowBackground">@color/backgroundDark</item>
         <item name="actionBarPopupTheme">@style/PopupTheme</item>
         <item name="bubbleColor">@color/bubbleDark</item>
-        <item name="colorPrimary">@color/backgroundDark</item>
-        <item name="colorPrimaryDark">@color/backgroundDark</item>
-        <item name="colorAccent">@color/tools_theme</item>
+        <item name="colorPrimary">@color/textPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/textPrimaryDark</item>
+        <item name="colorAccent">@color/textPrimaryDark</item>
+        <item name="android:buttonBarButtonStyle">@style/DialogButtonStyle</item>
         <item name="selectableItemBackground">@drawable/ripple_dark</item>
         <item name="windowActionBar">false</item>
+    </style>
+
+    <style name="DialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/textPrimaryDark</item>
     </style>
 
     <style name="PopupTheme" parent="ThemeOverlay.AppCompat">
