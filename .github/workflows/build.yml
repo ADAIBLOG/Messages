@@ -28,7 +28,7 @@ jobs:
         cache: gradle
 
     - name: Build with Gradle
-      run: ./gradlew assembleDebug assembleRelease
+      run: ./gradlew assembleRelease
 
     - name: Run Android Lint
       run: ./gradlew lint
@@ -39,37 +39,39 @@ jobs:
     - name: List APK Output Directory
       run: ls -R presentation/build/outputs/apk || true
 
-    - name: Rename APK
+    - name: Rename APKs for clarity
       shell: bash
       run: |
         set -euo pipefail
         shopt -s nullglob
-        mapfile -t apk_files < <(printf '%s\n' presentation/build/outputs/apk/debug/Messages-v*-debug.apk)
-        if [[ "${#apk_files[@]}" -eq 0 ]]; then
-          echo "No APK found matching Messages-v*-debug.apk" >&2
-          exit 1
-        fi
-        if [[ "${#apk_files[@]}" -gt 1 ]]; then
-          echo "Multiple APKs found: ${apk_files[*]}" >&2
-          exit 1
-        fi
-        mv "${apk_files[0]}" presentation/build/outputs/apk/debug/Messages-debug.apk
-
-        mapfile -t apk_files < <(printf '%s\n' presentation/build/outputs/apk/release/Messages-v*-release.apk)
-        if [[ "${#apk_files[@]}" -eq 0 ]]; then
-          echo "No APK found matching Messages-v*-release.apk" >&2
-          exit 1
-        fi
-        if [[ "${#apk_files[@]}" -gt 1 ]]; then
-          echo "Multiple APKs found: ${apk_files[*]}" >&2
-          exit 1
-        fi
-        mv "${apk_files[0]}" presentation/build/outputs/apk/debug/Messages-release.apk
+        
+        # Create a directory for renamed APKs
+        mkdir -p presentation/build/outputs/apk/renamed
+        
+        # Rename release APKs by ABI
+        for apk in presentation/build/outputs/apk/release/*-release-*.apk; do
+          if [[ -f "$apk" ]]; then
+            # Extract information from filename
+            filename=$(basename "$apk")
+            # Expected format: org.prauga.messages-release-armeabi-v7a-1.0.2-3.apk
+            if [[ $filename =~ ^org\.prauga\.messages-release-(.*)-(.*)-(.*)\.apk$ ]]; then
+              abi=${BASH_REMATCH[1]}
+              version=${BASH_REMATCH[2]}
+              versionCode=${BASH_REMATCH[3]}
+              new_filename="Messages-v${version}-${abi}.apk"
+              echo "Renaming $filename to $new_filename"
+              cp "$apk" "presentation/build/outputs/apk/renamed/$new_filename"
+            else
+              # Fallback if filename format is different
+              new_filename="Messages-$(basename "$apk")"
+              echo "Renaming $filename to $new_filename (fallback)"
+              cp "$apk" "presentation/build/outputs/apk/renamed/$new_filename"
+            fi
+          fi
+        done
 
     - name: Upload App
       uses: actions/upload-artifact@v4
       with:
         name: apks
-        path: |
-          presentation/build/outputs/apk/**/Messages-debug.apk
-          presentation/build/outputs/apk/**/Messages-release.apk
+        path: presentation/build/outputs/apk/renamed/*
