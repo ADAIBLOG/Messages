@@ -101,7 +101,16 @@ class OtpDetector {
         val hasOtpKeyword = otpKeywords.any { lower.contains(it) }
         val hasSafetyKeyword = safetyKeywords.any { lower.contains(it) }
 
-        val candidates = extractCandidates(normalized)
+        // Extract candidates using keyword-based approach first
+        // This finds numbers near OTP keywords, adapting to various text styles
+        val keywordBasedCandidates = extractCandidatesFromKeywords(normalized, lower)
+        
+        // Fall back to original extraction for cases without explicit keywords
+        val candidates = if (keywordBasedCandidates.isNotEmpty()) {
+            keywordBasedCandidates
+        } else {
+            extractCandidates(normalized)
+        }
 
         if (candidates.isEmpty()) {
             val reason = if (hasOtpKeyword) {
@@ -114,7 +123,7 @@ class OtpDetector {
 
         // Compute a score for each candidate
         val scored = candidates.map { candidate ->
-            val score =
+            val score = 
                 scoreCandidate(candidate, normalized, lower, hasOtpKeyword, hasSafetyKeyword)
             candidate.copy(score = score)
         }
@@ -161,19 +170,121 @@ class OtpDetector {
     private fun normalizeWhitespace(input: String): String =
         input.replace(Regex("\\s+"), " ").trim()
 
+    /**
+     * Extracts OTP candidates based on the position of OTP keywords in the message.
+     * This approach finds numbers near OTP keywords, adapting to various text styles.
+     */
+    private fun extractCandidatesFromKeywords(message: String, lower: String): List<Candidate> {
+        val candidates = mutableSetOf<Candidate>()
+        val contextRadius = 50 // Number of characters to look around the keyword
+        
+        // Regular expression to match any sequence of 3-10 digits
+        val numberRegex = Regex("\\d{3,10}")
+        val alnumRegex = Regex("[0-9A-Za-z]{4,10}")
+        // Regular expression to match numeric with spaces or dashes (e.g., "123 456", "12-34-56")
+        val spacedRegex = Regex("\\d{2,4}([\\s-]\\d{2,4})+")
+        
+        // Find all OTP keywords in the message
+        otpKeywords.forEach { keyword ->
+            var keywordIndex = lower.indexOf(keyword)
+            while (keywordIndex >= 0) {
+                // Calculate context boundaries around the keyword
+                val keywordStart = keywordIndex
+                val keywordEnd = keywordIndex + keyword.length
+                
+                val contextStart = (keywordStart - contextRadius).coerceAtLeast(0)
+                val contextEnd = (keywordEnd + contextRadius).coerceAtMost(message.length)
+                
+                // Extract the context around the keyword
+                val context = message.substring(contextStart, contextEnd)
+                
+                // Look for spaced/dashed numbers in the context first (highest priority)
+                spacedRegex.findAll(context).forEach { spacedMatch ->
+                    val raw = spacedMatch.value
+                    val normalizedCode = raw.replace("[\\s-]".toRegex(), "")
+                    if (normalizedCode.length in 4..8) {
+                        val absoluteStart = contextStart + spacedMatch.range.first
+                        val absoluteEnd = contextStart + spacedMatch.range.last
+                        
+                        candidates.add(Candidate(
+                            code = normalizedCode,
+                            startIndex = absoluteStart,
+                            endIndex = absoluteEnd,
+                            isNumeric = true
+                        ))
+                    }
+                }
+                
+                // Look for numbers in the context
+                numberRegex.findAll(context).forEach { numberMatch ->
+                    val code = numberMatch.value
+                    // Calculate absolute positions in the original message
+                    val absoluteStart = contextStart + numberMatch.range.first
+                    val absoluteEnd = contextStart + numberMatch.range.last
+                    
+                    candidates.add(Candidate(
+                        code = code,
+                        startIndex = absoluteStart,
+                        endIndex = absoluteEnd,
+                        isNumeric = true
+                    ))
+                }
+                
+                // Also look for alphanumeric codes in the context (at least 2 digits)
+                alnumRegex.findAll(context).forEach { alnumMatch ->
+                    val code = alnumMatch.value
+                    if (code.any { it.isDigit() } && code.count { it.isDigit() } >= 2 && !code.all { it.isDigit() }) {
+                        val absoluteStart = contextStart + alnumMatch.range.first
+                        val absoluteEnd = contextStart + alnumMatch.range.last
+                        
+                        candidates.add(Candidate(
+                            code = code,
+                            startIndex = absoluteStart,
+                            endIndex = absoluteEnd,
+                            isNumeric = false
+                        ))
+                    }
+                }
+                
+                // Look for the next occurrence of this keyword
+                keywordIndex = lower.indexOf(keyword, keywordIndex + keyword.length)
+            }
+        }
+        
+        return candidates.toList()
+    }
+    
     private fun extractCandidates(message: String): List<Candidate> {
         val candidates = mutableListOf<Candidate>()
 
         // 1) Pure numeric chunks 3–10 digits
-        val numericRegex = Regex("\\b\\d{3,10}\\b")
-        numericRegex.findAll(message).forEach { match ->
-            val code = match.value
+        // Modified to handle Chinese context: support digits after Chinese characters without word boundaries
+        // Pattern 1: Handle cases like "验证码123456" (Chinese chars directly followed by digits)
+        val chineseFollowedByDigitsRegex = Regex("[\\p{IsHan}]+(\\d{3,10})")
+        chineseFollowedByDigitsRegex.findAll(message).forEach { match ->
+            val code = match.groupValues[1]
             candidates += Candidate(
                 code = code,
-                startIndex = match.range.first,
+                startIndex = match.range.first + match.value.length - code.length,
                 endIndex = match.range.last,
                 isNumeric = true
             )
+        }
+        
+        // Pattern 2: Handle other cases (digits at start, with spaces/punctuation, etc.)
+        val numericRegex = Regex("(^|\\s|\\W)(\\d{3,10})(\\W|\\s|$)")
+        numericRegex.findAll(message).forEach { match ->
+            // Extract just the digits part (group 2)
+            val code = match.groupValues[2]
+            // Avoid duplicate candidates
+            if (candidates.none { it.code == code && it.startIndex == match.range.first + match.groupValues[1].length }) {
+                candidates += Candidate(
+                    code = code,
+                    startIndex = match.range.first + match.groupValues[1].length,
+                    endIndex = match.range.first + match.groupValues[1].length + code.length - 1,
+                    isNumeric = true
+                )
+            }
         }
 
         // 2) Numeric with a single space or dash (e.g., "123 456", "12-34-56")
