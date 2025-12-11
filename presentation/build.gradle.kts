@@ -91,12 +91,13 @@ android {
     applicationVariants.all {
         val variant = this
         variant.outputs.all {
-            val output = this as com.android.build.gradle.api.BaseVariantOutput
-            val abiName = output.filters.find { it.filterType == "ABI" }?.identifier
+            val abiName = filters.find { it.filterType == "ABI" }?.identifier
             if (abiName != null) {
-                output.outputFileName = "${applicationId}-${variant.name}-${abiName}-${versionName}-${versionCode}.apk"
+                this as com.android.build.gradle.api.ApkVariantOutput
+                fileName = "${applicationId}-${variant.name}-${abiName}-${versionName}-${versionCode}.apk"
             } else {
-                output.outputFileName = "${applicationId}-${variant.name}-${versionName}-${versionCode}.apk"
+                this as com.android.build.gradle.api.ApkVariantOutput
+                fileName = "${applicationId}-${variant.name}-${versionName}-${versionCode}.apk"
             }
         }
     }
