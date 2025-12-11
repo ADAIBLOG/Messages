@@ -49,15 +49,14 @@ jobs:
         mkdir -p presentation/build/outputs/apk/renamed
         
         # Rename release APKs by ABI
-        for apk in presentation/build/outputs/apk/release/*-release-*.apk; do
+        for apk in presentation/build/outputs/apk/release/*-release.apk; do
           if [[ -f "$apk" ]]; then
             # Extract information from filename
             filename=$(basename "$apk")
-            # Expected format: org.prauga.messages-release-armeabi-v7a-1.0.2-3.apk
-            if [[ $filename =~ ^org\.prauga\.messages-release-(.*)-(.*)-(.*)\.apk$ ]]; then
-              abi=${BASH_REMATCH[1]}
-              version=${BASH_REMATCH[2]}
-              versionCode=${BASH_REMATCH[3]}
+            # Current format: Messages-v1.0.2-arm64-v8a-release.apk
+            if [[ $filename =~ ^Messages-v(.*)-(.*)-release\.apk$ ]]; then
+              version=${BASH_REMATCH[1]}
+              abi=${BASH_REMATCH[2]}
               new_filename="Messages-v${version}-${abi}.apk"
               echo "Renaming $filename to $new_filename"
               cp "$apk" "presentation/build/outputs/apk/renamed/$new_filename"
