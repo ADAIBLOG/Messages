@@ -14,6 +14,7 @@ data class OtpDetectionResult(
 class OtpDetector {
 
     private val otpKeywords = listOf(
+        // English keywords
         "otp",
         "one time password",
         "one-time password",
@@ -33,10 +34,28 @@ class OtpDetector {
         "transaction code",
         "confirm code",
         "confirmation code",
-        "code"
+        "code",
+        // Chinese keywords
+        "验证码",
+        "登录码",
+        "安全码",
+        "校验码",
+        "密码",
+        "动态码",
+        "一次性密码",
+        "授权码",
+        "访问码",
+        "重置码",
+        "交易码",
+        "确认码",
+        "认证码",
+        "OTP",
+        "2FA",
+        "MFA"
     ).map { it.lowercase() }
 
     private val safetyKeywords = listOf(
+        // English safety keywords
         "do not share",
         "don't share",
         "never share",
@@ -46,12 +65,28 @@ class OtpDetector {
         "valid for",
         "expires in",
         "expires within",
-        "expires after"
+        "expires after",
+        // Chinese safety keywords
+        "请勿分享",
+        "不要分享",
+        "切勿分享",
+        "请勿透露",
+        "请勿转发",
+        "保密",
+        "有效时间",
+        "有效期为",
+        "将在",
+        "内过期",
+        "后过期"
     ).map { it.lowercase() }
 
     private val moneyIndicators = listOf(
+        // English money indicators
         "rs", "inr", "usd", "eur", "gbp", "₹", "$", "€", "£", "balance",
-        "amount", "debited", "credited", "txn", "transaction id", "order id"
+        "amount", "debited", "credited", "txn", "transaction id", "order id",
+        // Chinese money indicators
+        "人民币", "元", "¥", "金额", "余额", "转入", "转出", "交易", "订单", "交易号", "订单号",
+        "已扣除", "已入账", "支付", "收款"
     ).map { it.lowercase() }
 
     fun detect(rawMessage: String): OtpDetectionResult {
@@ -216,16 +251,17 @@ class OtpDetector {
             score += 2.5
         }
 
-        // Typical OTP line patterns
+        // Typical OTP line patterns - support both English and Chinese
         if (Regex(
-                "(otp|code|password|passcode)",
+                "(otp|code|password|passcode|验证码|登录码|安全码|校验码|动态码|密码|一次性密码|授权码|认证码)",
                 RegexOption.IGNORE_CASE
             ).containsMatchIn(lineInfo.line)
         ) {
             score += 2.0
         }
 
-        if (Regex("(:|is|=)\\s*${Regex.escape(candidate.code)}").containsMatchIn(lineInfo.line)) {
+        // Support both English and Chinese separators
+        if (Regex("(:|is|=|是|为|：)\\s*${Regex.escape(candidate.code)}").containsMatchIn(lineInfo.line)) {
             score += 1.5
         }
 
