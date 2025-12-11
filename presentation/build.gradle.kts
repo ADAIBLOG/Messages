@@ -92,13 +92,7 @@ android {
         val variant = this
         variant.outputs.all {
             val abiName = filters.find { it.filterType == "ABI" }?.identifier
-            if (abiName != null) {
-                this as com.android.build.gradle.api.ApkVariantOutput
-                fileName = "${applicationId}-${variant.name}-${abiName}-${versionName}-${versionCode}.apk"
-            } else {
-                this as com.android.build.gradle.api.ApkVariantOutput
-                fileName = "${applicationId}-${variant.name}-${versionName}-${versionCode}.apk"
-            }
+            // Default naming handled by AGP with archivesBaseName set earlier
         }
     }
 
