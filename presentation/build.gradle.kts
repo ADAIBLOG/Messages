@@ -76,6 +76,30 @@ android {
             signingConfig = signingConfigs.getByName("platform")
         }
     }
+    
+    // Split APK by ABI to generate v7a and v8a versions
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false
+        }
+    }
+    
+    // Set version information for split APKs
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val output = this as com.android.build.gradle.api.BaseVariantOutput
+            val abiName = output.filters.find { it.filterType == "ABI" }?.identifier
+            if (abiName != null) {
+                output.outputFileName = "${applicationId}-${variant.name}-${abiName}-${versionName}-${versionCode}.apk"
+            } else {
+                output.outputFileName = "${applicationId}-${variant.name}-${versionName}-${versionCode}.apk"
+            }
+        }
+    }
 
     dependenciesInfo {
         // Disables dependency metadata when building APKs and AABs.
