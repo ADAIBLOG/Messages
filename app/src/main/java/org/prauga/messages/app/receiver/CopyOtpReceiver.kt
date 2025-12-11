@@ -17,7 +17,7 @@ class CopyOtpReceiver : BroadcastReceiver() {
         val clip = ClipData.newPlainText("OTP", otpCode)
         clipboard.setPrimaryClip(clip)
 
-        Toast.makeText(context, context.getString(R.string.otp_copied, otpCode), Toast.LENGTH_SHORT)
+        Toast.makeText(context, context.getString(R.string.otp_copied), Toast.LENGTH_SHORT)
             .show()
     }
 }
