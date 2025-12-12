@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 // Needed until we upstream
 buildscript {
     dependencies {
-        classpath("io.realm:realm-gradle-plugin:10.15.0")
+        classpath("io.realm:realm-gradle-plugin:10.19.0")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.5.2")
     }
 }
