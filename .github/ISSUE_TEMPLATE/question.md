@@ -1,7 +1,7 @@
 ---
 name: Question
 about: submit questions that need answers
-title: "❓ [ QUESTION ]  "
+title: "[QUESTION] "
 labels: question
 assignees: ''
 
