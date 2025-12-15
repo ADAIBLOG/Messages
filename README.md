@@ -74,6 +74,12 @@ Messages is developed and maintained by [Saalim Quadri](https://github.com/danas
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=danascape/Messages&type=date&legend=top-left)](https://www.star-history.com/#danascape/Messages&type=date&legend=top-left)
+
+---
+
 ## License
 
 Messages is released under the **The GNU General Public License v3.0 (GPLv3)**, which can be found in the [LICENSE](LICENSE) file in the root of this project.
