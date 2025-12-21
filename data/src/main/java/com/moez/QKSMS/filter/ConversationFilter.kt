@@ -18,13 +18,15 @@
  */
 package org.prauga.messages.filter
 
+import org.prauga.messages.extensions.removeAccents
 import org.prauga.messages.model.Conversation
 import javax.inject.Inject
 
-class ConversationFilter @Inject constructor(private val recipientFilter: RecipientFilter) : Filter<Conversation>() {
+class ConversationFilter @Inject constructor(private val recipientFilter: RecipientFilter) :
+    Filter<Conversation>() {
 
     override fun filter(item: Conversation, query: CharSequence): Boolean {
-        if (item.name.contains(query, ignoreCase = true)) {
+        if (item.name.removeAccents().contains(query, ignoreCase = true)) {
             return true
         }
         return item.recipients.any { recipient -> recipientFilter.filter(recipient, query) }
