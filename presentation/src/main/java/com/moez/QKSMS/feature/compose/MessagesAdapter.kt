@@ -360,13 +360,18 @@ class MessagesAdapter @Inject constructor(
         )
 
         val isDarkMode = (context.resources.configuration.uiMode and
-            Configuration.UI_MODE_NIGHT_MASK) ==
-            Configuration.UI_MODE_NIGHT_YES
+                Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
 
         if (!message.isMe()) {
             (binding as InBindingWrapper).avatar.apply {
-                setRecipient(contactCache[message.address])
-                setVisible(!canGroup(message, next), View.INVISIBLE)
+                val isGroupChat = (conversation?.recipients?.size ?: 0) > 1
+                if (isGroupChat) {
+                    setRecipient(contactCache[message.address])
+                    setVisible(!canGroup(message, next), View.INVISIBLE)
+                } else {
+                    visibility = View.GONE
+                }
             }
 
             val incomingBubbleColor = if (isDarkMode) {
