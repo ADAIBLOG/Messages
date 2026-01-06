@@ -18,165 +18,151 @@
   ~ along with QKSMS.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <org.prauga.messages.common.widget.QkTextView
+            android:id="@+id/timestamp"
+            style="@style/TextSecondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Tue at 11:39pm" />
+
+        <ImageView
+            android:id="@+id/sim"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="2dp"
+            android:src="@drawable/ic_sim_card_black_24dp"
+            app:layout_constraintBottom_toBottomOf="@id/timestamp"
+            app:layout_constraintStart_toEndOf="@id/timestamp"
+            app:layout_constraintTop_toTopOf="@id/timestamp"
+            app:tint="?android:attr/textColorSecondary" />
+
+        <org.prauga.messages.common.widget.QkTextView
+            android:id="@+id/simIndex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintBottom_toBottomOf="@id/timestamp"
+            app:layout_constraintStart_toEndOf="@id/sim"
+            app:layout_constraintTop_toTopOf="@id/timestamp"
+            app:textSize="tertiary"
+            tools:text="1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:layout_marginEnd="36dp"
-        android:orientation="vertical">
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <org.prauga.messages.common.widget.AvatarView
+            android:id="@+id/avatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="bottom" />
 
-            <org.prauga.messages.common.widget.QkTextView
-                android:id="@+id/timestamp"
-                style="@style/TextSecondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                app:layout_constraintEnd_toStartOf="@id/sim"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Tue at 11:39pm" />
-
-            <ImageView
-                android:id="@+id/sim"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginEnd="2dp"
-                android:src="@drawable/ic_sim_card_black_24dp"
-                app:layout_constraintBottom_toBottomOf="@id/timestamp"
-                app:layout_constraintEnd_toStartOf="@id/simIndex"
-                app:layout_constraintStart_toEndOf="@id/timestamp"
-                app:layout_constraintTop_toTopOf="@id/timestamp"
-                app:tint="?android:attr/textColorSecondary" />
-
-            <org.prauga.messages.common.widget.QkTextView
-                android:id="@+id/simIndex"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
-                app:layout_constraintBottom_toBottomOf="@id/timestamp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/sim"
-                app:layout_constraintTop_toTopOf="@id/timestamp"
-                app:textSize="tertiary"
-                tools:text="1" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:clipChildren="false"
             android:clipToPadding="false"
-            android:clipChildren="false">
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
 
-            <org.prauga.messages.common.widget.AvatarView
-                android:id="@+id/avatar"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="bottom"
-                app:layout_constraintBottom_toBottomOf="@id/body"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <org.prauga.messages.common.widget.QkContextMenuRecyclerViewLongMmsPart
+                android:id="@+id/parts"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:clipToPadding="false"
-                android:clipChildren="false"
-                android:paddingEnd="4dp"
-                android:paddingStart="4dp">
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:nestedScrollingEnabled="false"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="1"
+                tools:listitem="@layout/mms_image_preview_list_item" />
 
-                <org.prauga.messages.common.widget.QkContextMenuRecyclerViewLongMmsPart
-                    android:id="@+id/parts"
+            <org.prauga.messages.common.widget.TightTextView
+                android:id="@+id/body"
+                style="@style/TextPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/parts"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="2dp"
+                android:autoLink="email|phone|web"
+                android:background="@drawable/message_only"
+                android:gravity="start|center_vertical"
+                android:minHeight="36dp"
+                android:textIsSelectable="true"
+                tools:backgroundTint="@color/tools_theme"
+                tools:text="@tools:sample/lorem/random" />
+
+            <LinearLayout
+                android:id="@+id/reactions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/body"
+                android:layout_alignBottom="@id/body"
+                android:layout_marginEnd="-12dp"
+                android:layout_marginBottom="-20dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/reactionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:nestedScrollingEnabled="false"
-                    android:orientation="vertical"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="1"
-                    tools:listitem="@layout/mms_image_preview_list_item" />
-
-                <org.prauga.messages.common.widget.TightTextView
-                    android:id="@+id/body"
-                    style="@style/TextPrimary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@id/parts"
-                    android:layout_marginTop="2dp"
-                    android:autoLink="email|phone|web"
                     android:background="@drawable/message_only"
-                    android:gravity="start|center_vertical"
-                    android:minHeight="36dp"
-                    android:textIsSelectable="true"
-                    tools:backgroundTint="@color/tools_theme"
-                    tools:text="@tools:sample/lorem/random" />
+                    android:backgroundTint="?android:attr/colorBackground"
+                    android:elevation="2dp"
+                    android:maxLines="1"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:text="😂 2"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="16sp" />
 
-                <LinearLayout
-                    android:id="@+id/reactions"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/body"
-                    android:layout_alignEnd="@id/body"
-                    android:layout_marginEnd="-12dp"
-                    android:layout_marginBottom="-20dp"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    tools:visibility="visible">
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/reactionText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/message_only"
-                        android:backgroundTint="?android:attr/colorBackground"
-                        android:elevation="2dp"
-                        android:maxLines="1"
-                        android:paddingStart="8dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="4dp"
-                        android:text="😂 2"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <org.prauga.messages.common.widget.QkTextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="72dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/body"
-            app:textSize="tertiary"
-            tools:text="Sending..." />
+        </RelativeLayout>
 
     </LinearLayout>
 
-</FrameLayout>
+    <org.prauga.messages.common.widget.QkTextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="?android:attr/textColorSecondary"
+        app:textSize="tertiary"
+        tools:text="Sending..." />
+
+</LinearLayout>

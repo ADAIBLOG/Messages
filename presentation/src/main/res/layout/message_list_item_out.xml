@@ -17,12 +17,57 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with QKSMS.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/compose_message_item">
+
+        <org.prauga.messages.common.widget.QkTextView
+            android:id="@+id/timestamp"
+            style="@style/TextSecondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Tue at 11:39pm" />
+
+        <ImageView
+            android:id="@+id/sim"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="2dp"
+            android:contentDescription="@string/compose_message_sim"
+            android:src="@drawable/ic_sim_card_black_24dp"
+            app:layout_constraintBottom_toBottomOf="@id/timestamp"
+            app:layout_constraintStart_toEndOf="@id/timestamp"
+            app:layout_constraintTop_toTopOf="@id/timestamp"
+            app:tint="?android:attr/textColorSecondary" />
+
+        <org.prauga.messages.common.widget.QkTextView
+            android:id="@+id/simIndex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintBottom_toBottomOf="@id/timestamp"
+            app:layout_constraintStart_toEndOf="@id/sim"
+            app:layout_constraintTop_toTopOf="@id/timestamp"
+            app:textSize="tertiary"
+            tools:text="1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,52 +75,6 @@
         android:layout_marginStart="36dp"
         android:layout_marginEnd="12dp"
         android:orientation="vertical">
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/compose_message_item">
-
-            <org.prauga.messages.common.widget.QkTextView
-                android:id="@+id/timestamp"
-                style="@style/TextSecondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="8dp"
-                app:layout_constraintEnd_toStartOf="@id/sim"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Tue at 11:39pm" />
-
-            <ImageView
-                android:id="@+id/sim"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginEnd="2dp"
-                android:contentDescription="@string/compose_message_sim"
-                android:src="@drawable/ic_sim_card_black_24dp"
-                app:layout_constraintBottom_toBottomOf="@id/timestamp"
-                app:layout_constraintEnd_toStartOf="@id/simIndex"
-                app:layout_constraintStart_toEndOf="@id/timestamp"
-                app:layout_constraintTop_toTopOf="@id/timestamp"
-                app:tint="?android:attr/textColorSecondary" />
-
-            <org.prauga.messages.common.widget.QkTextView
-                android:id="@+id/simIndex"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
-                app:layout_constraintBottom_toBottomOf="@id/timestamp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/sim"
-                app:layout_constraintTop_toTopOf="@id/timestamp"
-                app:textSize="tertiary"
-                tools:text="1" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <org.prauga.messages.common.widget.QkContextMenuRecyclerViewLongMmsPart
             android:id="@+id/parts"
@@ -139,9 +138,9 @@
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/sendNowIcon"
                 android:layout_toEndOf="@id/cancelFrame"
-                android:orientation="horizontal"
                 android:clipChildren="false"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:orientation="horizontal">
 
                 <View
                     android:layout_width="0dp"
@@ -151,9 +150,9 @@
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="18dp"
+                    android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:clipChildren="false">
+                    android:paddingStart="18dp">
 
                     <org.prauga.messages.common.widget.TightTextView
                         android:id="@+id/body"
@@ -253,4 +252,4 @@
 
     </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>
