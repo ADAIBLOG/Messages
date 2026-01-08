@@ -1,4 +1,4 @@
-name: Build
+name: Build and Test
 
 on:
   workflow_dispatch:
@@ -32,7 +32,9 @@ jobs:
         echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > keystore/platform.jks
 
     - name: Build with Gradle
-      run: ./gradlew assembleRelease
+      env:
+        GRADLE_OPTS: "-Xmx4096m -XX:MaxMetaspaceSize=512m"
+      run: ./gradlew assembleRelease --no-daemon
 
     - name: Run Android Lint
       run: ./gradlew lint
