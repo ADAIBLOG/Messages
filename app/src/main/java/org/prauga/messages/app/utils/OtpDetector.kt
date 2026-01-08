@@ -260,9 +260,8 @@ class OtpDetector {
             score -= 1.5
         }
 
-        // Local context: the line containing the candidate
+        // Local context: line containing the candidate
         val lineInfo = extractLineContext(original, candidate.startIndex, candidate.endIndex)
-        val lineLower = lineInfo.line.lowercase()
 
         // If the line is mostly just the code -> strong hint
         val trimmedLine = lineInfo.line.trim()
