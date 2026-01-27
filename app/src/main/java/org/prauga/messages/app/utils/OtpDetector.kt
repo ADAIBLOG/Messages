@@ -33,14 +33,7 @@ class OtpDetector {
         "transaction code",
         "confirm code",
         "confirmation code",
-        "code",
-        "验证码",
-        "登录码",
-        "安全码",
-        "动态码",
-        "一次性密码",
-        "二次验证码",
-        "两步验证"
+        "code"
     ).map { it.lowercase() }
 
     private val safetyKeywords = listOf(
@@ -53,14 +46,7 @@ class OtpDetector {
         "valid for",
         "expires in",
         "expires within",
-        "expires after",
-        "请勿分享",
-        "切勿分享",
-        "不要分享",
-        "保密",
-        "有效期",
-        "将在",
-        "分钟内过期"
+        "expires after"
     ).map { it.lowercase() }
 
     private val moneyIndicators = listOf(
@@ -79,14 +65,11 @@ class OtpDetector {
 
         val hasOtpKeyword = otpKeywords.any { lower.contains(it) }
         val hasSafetyKeyword = safetyKeywords.any { lower.contains(it) }
-        
-        // Check if it contains characters related to Chinese CAPTCHAs
-        val hasChineseOtpChars = lower.contains("验证码") || lower.contains("登录") || lower.contains("码")
 
         val candidates = extractCandidates(normalized)
 
         if (candidates.isEmpty()) {
-            val reason = if (hasOtpKeyword || hasChineseOtpChars) {
+            val reason = if (hasOtpKeyword) {
                 "Contains OTP-like keywords but no numeric/alphanumeric candidate code found"
             } else {
                 "No OTP-like keywords and no candidate code found"
@@ -103,7 +86,7 @@ class OtpDetector {
 
         val best = scored.maxByOrNull { it.score }!!
 
-        val globalConfidence = computeGlobalConfidence(best, hasOtpKeyword, hasSafetyKeyword, hasChineseOtpChars)
+        val globalConfidence = computeGlobalConfidence(best, hasOtpKeyword, hasSafetyKeyword)
 
         val isOtp = globalConfidence >= 0.6
 
@@ -146,8 +129,8 @@ class OtpDetector {
     private fun extractCandidates(message: String): List<Candidate> {
         val candidates = mutableListOf<Candidate>()
 
-        // 1) Pure numeric chunks 3–10 digits (with word boundary support for Chinese)
-        val numericRegex = Regex("(?:\\b|^|(?<=[^0-9]))\\d{3,10}(?:\\b|$|(?=[^0-9]))")
+        // 1) Pure numeric chunks 3–10 digits
+        val numericRegex = Regex("\\b\\d{3,10}\\b")
         numericRegex.findAll(message).forEach { match ->
             val code = match.value
             candidates += Candidate(
@@ -352,15 +335,14 @@ class OtpDetector {
     private fun computeGlobalConfidence(
         best: Candidate,
         hasOtpKeyword: Boolean,
-        hasSafetyKeyword: Boolean,
-        hasChineseOtpChars: Boolean
+        hasSafetyKeyword: Boolean
     ): Double {
         var confidence = 0.0
 
         // Base on score; tuned experimentally
         confidence += (best.score / 8.0).coerceIn(0.0, 1.0)
 
-        if (hasOtpKeyword || hasChineseOtpChars) confidence += 0.15
+        if (hasOtpKeyword) confidence += 0.15
         if (hasSafetyKeyword) confidence += 0.15
 
         return confidence.coerceIn(0.0, 1.0)
