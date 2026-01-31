@@ -2,7 +2,7 @@
  * Copyright (C) 2025 Saalim Quadri <danascape@gmail.com>
  */
 
-package org.prauga.messages.app.utils
+package org.prauga.messages.common.util
 
 data class OtpDetectionResult(
     val isOtp: Boolean,
